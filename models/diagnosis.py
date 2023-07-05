@@ -30,7 +30,7 @@ class Diagnosis:
         String representation of Diagnosis class.
 
         Returns:
-            str: String representation of this class.
+            (```str```): String representation of this class.
         """
         return f'Diagnosis [diagnosisID = {self.diagnosisID}, patientID = {self.patientID}, diagnosis = {self.diagnosis}]'
     
@@ -39,7 +39,7 @@ class Diagnosis:
         String representation of Diagnosis class.
 
         Returns:
-            str: String representation of this class.
+            (```str```): String representation of this class.
         """
         return self.__str__()
     
@@ -48,7 +48,7 @@ class Diagnosis:
         Tests for equality between this object, and another object.
 
         Returns:
-            bool: True if the other object is not None, is an instance of this class, and all attributes are equal to this objects attributes. False otherwise.
+            (```bool```): True if the other object is not None, is an instance of this class, and all attributes are equal to this objects attributes. False otherwise.
         """
         if other is None:
             return False
@@ -61,6 +61,6 @@ class Diagnosis:
         Hash representation of this class.
 
         Returns:
-            int: Hash of diagnosisID, patientID and diagnosis.
+            (```int```): Hash of diagnosisID, patientID and diagnosis.
         """
         return hash((self.diagnosisID, self.patientID, self.diagnosis))

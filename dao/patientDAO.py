@@ -7,14 +7,30 @@ from utils import connectionUtil
 
 
 class PatientDAO:
+    """
+    Access patient information in the database and return as a patient object. Save patient information in the database by passing in patient object.
+
+    Attributes:
+        (```class```) conn (```psycopg.Connection | None```): Connection to the database or None if no connection or connection was closed.
+        (```class```) cursor (```psycopg.Cursor | None```): Cursor to perform actions on database and return data from database or None if no cursor or cursor was closed.
+    """
 
     conn: ClassVar[psycopg.Connection | None] = None
     cursor: ClassVar[psycopg.Cursor | None] = None
 
     def __init__(self) -> None:
+        """
+        Constructor for PatientDAO class.
+        """
         pass
 
     def getAllPatients(self) -> List[Patient]:
+        """
+        Get all patient information from the database.
+
+        Returns:
+            (```List```[```Patient```]): List of all patients and their information as patient objects. If database is empty, return empty list.
+        """
         patientList: List[Patient] = []
 
         try:
@@ -43,7 +59,11 @@ class PatientDAO:
         """
         Get paitient by patientID.
 
-        Return patient object or None
+        Parameters:
+            patientID (```int```): Patient ID.
+
+        Returns:
+            (```Patient | None```): patient object or None
         """
         patient: Patient | None = None
 
@@ -73,7 +93,11 @@ class PatientDAO:
         """
         Add patient to database.
 
-        Takes patient object (No patientID!) and returns patient object with patientID fron database
+        Parameters:
+            patient (```Patient```): Patient object (No patientID!) to add to database.
+            
+        Returns:
+            (```Patient```): Patient object with patientID from database.
         """
         patientName: str = patient.name
         patientAge: int = patient.age
@@ -87,7 +111,7 @@ class PatientDAO:
 
             sql: str = """INSERT INTO patient(name, age, gender, height, weight) VALUES (%s, %s, %s, %s, %s) RETURNING *;"""
             PatientDAO.cursor.execute(sql, (patientName, patientAge, patientGender, patientHeight, patientWeight))
-            
+
             if PatientDAO.cursor.rowcount > 0:
                 patientID: int = PatientDAO.cursor.fetchone()[0]
                 patient.patientID = patientID
@@ -104,6 +128,15 @@ class PatientDAO:
         return None
 
     def updatePatient(self, patient: Patient) -> Patient | None:
+        """
+        Update patient in database.
+
+        Parameters:
+            patient (```Patient```): Patient and their information to update in database.
+
+        Returns:
+            (```Patient | None```): Updated patient if update was successful or None otherwise.
+        """
         patientName: str = patient.name
         patientAge: int = patient.age
         patientGender: str = patient.gender
@@ -133,6 +166,15 @@ class PatientDAO:
         return None
 
     def deletePatient(self, patientID: int) -> bool:
+        """
+        Delete patient at patientID in database.
+
+        Parameters:
+            patientID (```int```): Patient ID.
+
+        Returns:
+            (```bool```): True if patient at patient ID was deleted, False otherwise.
+        """
         try:
             PatientDAO.conn = connectionUtil.getConnection()
             PatientDAO.cursor = PatientDAO.conn.cursor()
@@ -152,6 +194,9 @@ class PatientDAO:
         return False
 
     def __closeResources(self) -> None:
+        """
+        Close cursor and conn resources if they are open.
+        """
         try:
             if PatientDAO.cursor is not None:
                 PatientDAO.cursor.close()

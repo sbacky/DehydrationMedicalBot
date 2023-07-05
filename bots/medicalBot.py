@@ -11,9 +11,23 @@ class MedicalBot:
     List all patients and their diagnosis.
     Store patients and their diagnosis as a (key, value) pair.
 
-    ```
-    def __init__(self) -> None
-    ```
+    Attributes:
+        (```class````) namePrompt (```str```): Prompt to get patient name.
+        (```class````) agePrompt (```str```): Prompt to get patient age.
+        (```class````) genderPrompt (```str```): Prompt to get patient gender.
+        (```class````) heightPrompt (```str```): Prompt to get patient height.
+        (```class````) weightPrompt (```str```): Prompt to get patient weight.
+        (```class````) appearancePrompt (```str```): Prompt to assess patient appearance.
+        (```class````) eyePrompt (```str```): Prompt to assess patiet eys.
+        (```class````) skinPrompt (```str```): Prompt to assess the patients skin.
+        (```class````) patientErrorMessage (```str```): Error message displayed when invalid patient information is received.
+        (```class````) saveErrorMessage (```str```): Error message displayed when patient or diagnosis could not be saved to the database.
+        (```class````) diagnosisErrorMessage (```str```): Error message displayed when invalid diagnosis information is received.
+        (```class````) severeDehydration (```str```): Severe Dehydration diagnosis.
+        (```class````) someDehydration (```str```): Some Dehydration diagnosis.
+        (```class````) noDehydration (```str```): No Dehydration diagnosis.
+        patientService (```PatientService```): Patient service object to validate patient information and access database.
+        diagnosisService (```DiagnosisService```): Diagnosis service object to validate diagnosis information and access the database.
     """
 
     namePrompt: ClassVar[str] = "What is the patient's name?\n"
@@ -26,15 +40,22 @@ class MedicalBot:
     eyePrompt: ClassVar[str] = "How are the patient's eyes?\n - 1: Eyes normal or slightly sunken\n - 2: Eyes very sunken\n"
     skinPrompt: ClassVar[str] = "How is the patient's skin when you pinch it?\n - 1: Normal skin pinch\n - 2: Slow skin pinch\n"
 
-    patientErrorMessage: ClassVar[str] = "Could not save patient information due to invalid input"
-    saveErrorMessage: ClassVar[str] = "Could not get patient information at patient ID: "
-    diagnosisErrorMessage: ClassVar[str] = "Could not get new diagnosis information"
+    patientErrorMessage: ClassVar[str] = "Could not save patient information due to invalid input."
+    saveErrorMessage: ClassVar[str] = "Could not save Patient or Diagnosis information."
+    diagnosisErrorMessage: ClassVar[str] = "Could not get new diagnosis information."
 
     severeDehydration: ClassVar[str] = "Severe dehydration"
     someDehydration: ClassVar[str] = "Some dehydration"
     noDehydration: ClassVar[str]= "No dehydration"
 
     def __init__(self, patientService: PatientService | None = None, diagnosisService: DiagnosisService | None = None) -> None:
+        """
+        Constructor for MedicalBot class.
+
+        Attributes:
+            patientService (```PatientService```): Patient service object to validate patient information and access database.
+            diagnosisService (```DiagnosisService```): Diagnosis service object to validate diagnosis information and access the database.
+        """
         if patientService is None:
             self.patientService: PatientService | None = PatientService()
         else:
@@ -46,6 +67,15 @@ class MedicalBot:
             self.diagnosisService = diagnosisService
 
     def __assessSkin(self, skin: str) -> str:
+        """
+        Assess skin for dehydration with answer from quick questionnaire.
+
+        Parameters:
+            skin (```str```): Answer from questionnaire.
+
+        Returns:
+            (```str```): Diagnosis of skin for dehydration.
+        """
         diagnosis: str = ""
         if skin == "1":
             diagnosis = self.someDehydration
@@ -54,6 +84,15 @@ class MedicalBot:
         return diagnosis
 
     def __assessEyes(self, eyes: str) -> str:
+        """
+        Assess eyes for dehydration with answer from quick questionnaire.
+
+        Parameters:
+            eyes (```str```): Answer from questionnaire.
+
+        Returns:
+            (```str```): Diagnosis of eyes for dehydration.
+        """
         diagnosis: str = ""
         if eyes == "1":
             diagnosis = self.noDehydration
@@ -62,6 +101,12 @@ class MedicalBot:
         return diagnosis
 
     def __assessAppearance(self) -> str:
+        """
+        Assess appearance for dehydration with a quick questionnaire. Depending on answer, assess eyes or skin.
+
+        Returns:
+            (```str```): Diagnosis of dehydration from appearance.
+        """
         diagnosis: str = ""
         appearance = input(self.appearancePrompt)
         if appearance == "1":
@@ -73,6 +118,12 @@ class MedicalBot:
         return diagnosis
     
     def __getPatientInfo(self) -> Patient:
+        """
+        Get patient information from a series of prompts.
+
+        Returns:
+            (```Patient```): Patient object with information gathered from prompts.
+        """
         name: str = input(self.namePrompt)
         age: int = int(input(self.agePrompt))
         gender: str = input(self.genderPrompt)
@@ -81,6 +132,15 @@ class MedicalBot:
         return Patient(name, age, gender, height, weight)
     
     def __patientCheckIn(self, patientID: int | None) -> Patient:
+        """
+        If returning patient, get patient information from database, otherwise, get patient information through a series of prompts in __getPatientInfo() method.
+
+        Parameters:
+            patientID (```int | None```): Patient ID of returning patient, None if a new patient. Default None.
+        
+        Returns:
+            (```Patient```): Patient object from database or new patient object from series of prompts.
+        """
         patient: Patient | None = None
         if patientID is None:
             patient = self.__getPatientInfo()
@@ -93,9 +153,20 @@ class MedicalBot:
         return patient
     
     def savePatientAndDiagnosis(self, patient: Patient, diagnosis: Diagnosis) -> bool:
-        checkPatient: Patient | None = self.patientService.createPatient(patient)
-        if checkPatient is None:
-            return False
+        """
+        Save patient, if new patient, and diagnosis information in database. 
+
+        Parameters:
+            patient (```Patient```): Patient object to save in database.
+            diagnosis (```Diagnosis```): Diagnosis object to save in database.
+
+        Returns:
+            (```bool```): True if successfully saved, false otherswise.
+        """
+        if self.patientService.getPatientByID(patient.patientID) is None:
+            checkPatient: Patient | None = self.patientService.createPatient(patient)
+            if checkPatient is None:
+                return False
         diagnosis.patientID = checkPatient.patientID
         checkDiagnosis: Diagnosis = self.diagnosisService.createDiagnosis(diagnosis)
         if checkDiagnosis is None:
@@ -103,6 +174,9 @@ class MedicalBot:
         return True
     
     def listPatientsAndDiagnoses(self) -> None:
+        """
+        List all patients and there diagnoses (if any) printed to console.
+        """
         patients: List[Patient] = self.patientService.getAllPatients()
         print("----------")
         print()
@@ -116,6 +190,12 @@ class MedicalBot:
             print()
 
     def newDiagnosis(self, patientID: int | None = None) -> None:
+        """
+        Perform a new diagnosis and save diagnosis to database.
+
+        Parameters:
+            patientID (```int | None```): Patient ID of returning patient or None if new patient. Default is None.
+        """
         patient: Patient = self.__patientCheckIn(patientID)
         if patient is None:
             print(self.diagnosisErrorMessage)
