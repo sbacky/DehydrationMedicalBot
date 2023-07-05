@@ -43,6 +43,7 @@ class MedicalBot:
     patientErrorMessage: ClassVar[str] = "Could not save patient information due to invalid input."
     saveErrorMessage: ClassVar[str] = "Could not save Patient or Diagnosis information."
     diagnosisErrorMessage: ClassVar[str] = "Could not get new diagnosis information."
+    getPatientInforErrorMessage: ClassVar[str] = "Could not get Patient information"
 
     severeDehydration: ClassVar[str] = "Severe dehydration"
     someDehydration: ClassVar[str] = "Some dehydration"
@@ -149,7 +150,7 @@ class MedicalBot:
             if checkPatient is not None:
                 patient = checkPatient
             else:
-                print(self.patientErrorMessage, patientID)
+                print(self.getPatientInforErrorMessage, patientID)
         return patient
     
     def savePatientAndDiagnosis(self, patient: Patient, diagnosis: Diagnosis) -> bool:
@@ -198,7 +199,6 @@ class MedicalBot:
         """
         patient: Patient = self.__patientCheckIn(patientID)
         if patient is None:
-            print(self.diagnosisErrorMessage)
             return
         finalDiagnosis: str = self.__assessAppearance()
         diagnosis: Diagnosis = Diagnosis(finalDiagnosis)
