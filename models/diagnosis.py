@@ -4,9 +4,9 @@ class Diagnosis:
     Class to hold diagnosis information: patientID, diagnosis, diagnosisID
     
     Attributes:
-        patientID (```int```): Patient ID referencing patient in patient database.
+        patientID (```int | None```): Patient ID referencing patient in patient database.
         diagnosis (```str```): Diagnosis of the patient.
-        diagnosisID (```int```): ID given to diagnosis by database.
+        diagnosisID (```int | None```): ID given to diagnosis by database.
     """
 
     def __init__(self, diagnosis: str, patientID: int | None = None, diagnosisID: int | None = None) -> None:
@@ -14,15 +14,12 @@ class Diagnosis:
         Constructor for Diagnosis class.
 
         Attributes:
-            patientID (```int```): Patient ID referencing patient in patient database.
+            patientID (```int | None```): Patient ID referencing patient in patient database.
             diagnosis (```str```): Diagnosis of the patient.
-            diagnosisID (```int```): ID given to diagnosis by database.
+            diagnosisID (```int | None```): ID given to diagnosis by database.
         """
-        if diagnosisID is not None:
-            self.diagnosisID: int | None = diagnosisID
-        else:
-            self.diagnosisID = None
-        self.patientID: int = patientID
+        self.diagnosisID: int | None = diagnosisID
+        self.patientID: int | None = patientID
         self.diagnosis: str = diagnosis
 
     def __str__(self) -> str:

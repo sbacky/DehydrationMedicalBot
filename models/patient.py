@@ -23,11 +23,8 @@ class Patient:
             height (```int```): Height of the patient in inches.
             weight (```int```): Weight of the patient in lbs.
             patientID (```int | None```): ID given to patient by database.
-        """
-        if patientID is not None:    
-            self.patientID: int | None = patientID
-        else:
-            self.patientID = None
+        """   
+        self.patientID: int | None = patientID
         self.name: str = name
         self.age: int = age
         self.gender: str = gender
