@@ -168,10 +168,13 @@ class MedicalBot:
             checkPatient: Patient | None = self.patientService.createPatient(patient)
             if checkPatient is None:
                 return False
-        diagnosis.patientID = checkPatient.patientID
+            diagnosis.patientID = checkPatient.patientID
+        else:
+            diagnosis.patientID = patient.patientID
         checkDiagnosis: Diagnosis = self.diagnosisService.createDiagnosis(diagnosis)
         if checkDiagnosis is None:
             return False
+        print(patient, diagnosis)
         return True
     
     def listPatientsAndDiagnoses(self) -> None:
